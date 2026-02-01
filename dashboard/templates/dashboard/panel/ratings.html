@@ -1,0 +1,146 @@
+{% extends 'dashboard/panel/base.html' %}
+{% load static %}
+
+{% block title %} لوحة التحكم - ادارة التقييمات {% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-white mb-2">ادارة التقييمات</h1>
+
+
+    {% if form.errors %}
+    <div class="text-red-600 bg-red-50 p-4 rounded-md mb-4">
+        <ul>
+            {% for field in form %}
+                    {% for error in field.errors %}
+                            <li> {{ error }}</li>
+                    {% endfor %}
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+
+  
+    {% if request.GET.success == 'True' %}
+<div class="bg-green-100 text-green-800 p-4 rounded-md mb-4">
+    تم تحديث التقييم بنجاح
+ </div>
+{% endif %}
+
+  
+{% if request.GET.deleted == 'True' %}
+<div class="bg-green-100 text-green-800 p-4 rounded-md mb-4">
+    تم حذف التقييم بنجاح
+ </div>
+{% endif %}
+
+    <div class="flex flex-col md:flex-row gap-4 mb-6 items-center">
+            <form method="get" action="{% url 'dashboard:dashboard_ratings_view' %}" class="w-full">
+                <div class="relative">
+                    <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500">
+                        <i class="fas fa-search"></i>
+                    </span>
+                    <input type="text"  name="search" value="{{request.GET.search}}"  class="bg-gray-800 w-full pr-10 pl-4 py-2.5 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-white" placeholder="بحث عن الاسم الكامل...">
+                </div>
+            </form>
+     
+    </div>
+    <div class="bg-gray-800 rounded-xl shadow-sm border border-gray-700">
+        <div class="overflow-x-auto">
+            <table class="min-w-full text-sm text-right">
+            <thead class="bg-gray-700 text-gray-300">
+                <tr>
+                <th class="px-6 py-4">#</th>
+                <th class="px-6 py-4">الاسم</th>
+                <th class="px-6 py-4">التقييم</th>
+                <th class="px-6 py-4">الفعالية</th>
+                <th class="px-6 py-4">تاريخ الإضافة</th>
+                <th class="px-6 py-4">الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-700">
+            
+                {% if ratings %}
+                {% for rating in ratings %}
+                <tr class="hover:bg-gray-700">
+                <td class="px-6 py-4 text-gray-400">{{ forloop.counter }}</td>
+                <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                    <p class="font-medium text-white">{{ rating.request.user.first_name }} {{ rating.request.user.last_name }}</p>
+                    </div>
+                </td>
+                <td class="px-6 py-4 text-gray-400">{{ rating.stars }}/5 <i class="fa fa-star text-yellow-500"></i>
+                <br>
+                {{ rating.comment }}
+                </td>
+                <td class="px-6 py-4 text-gray-400">
+                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-900/30 text-blue-300">
+                        {{rating.event.title}}
+                    </span>
+                    <br>
+                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-900/30 text-gray-300 mt-2">
+                        {{rating.event.startdate_ar}}
+                    </span>
+                    <br>
+                    <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-900/30 text-orange-300 mt-2">
+                        {{rating.event.enddate_ar}}
+                    </span>
+                </td>
+
+                <td class="px-6 py-4 text-gray-400">
+                    {{ rating.created_at|date:"d M Y" }}
+                </td>
+                <td class="px-6 py-4">
+                    <div class="flex items-center justify-start gap-3 h-full">
+                        {% if rating.status == False %}
+                        <a class="text-green-400 hover:text-green-300 transition-colors" href="{% url 'dashboard:dashboard_ratings_update_status_view' rating.id %}">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        {% endif %}
+                        {% if rating.status == True %}
+                        <a class="text-red-400 hover:text-red-300 transition-colors" href="{% url 'dashboard:dashboard_ratings_update_status_view' rating.id %}">
+                            <i class="fas fa-eye-slash"></i>
+                        </a>
+                        {% endif %}
+                        <a href="#" onclick="confirmDelete(event, '{% url 'dashboard:dashboard_ratings_delete_view' rating.id %}')" class="text-red-400 hover:text-red-300 transition-colors">
+                            <i class="fas fa-trash"></i>
+                        </a>
+                    </div>
+                </td>
+           
+                </tr>
+            
+                {% endfor %}
+                {% else %}
+                <tr>
+                    <td colspan="7" class="p-3 text-center text-gray-500">لا يوجد تقييمات</td>
+                </tr>
+
+                {% endif %}
+
+            </tbody>
+            </table>
+        </div>
+    
+    </div>
+</div>
+<script>
+    function confirmDelete(event, url) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'هل أنت متأكد؟',
+            text: "لن تتمكن من التراجع",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'نعم ، احذف',
+            cancelButtonText: 'الغاء'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+</script>
+{% endblock %}

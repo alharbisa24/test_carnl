@@ -1,0 +1,252 @@
+{% extends 'dashboard/panel/base.html' %}
+{% load static %}
+
+{% block title %} لوحة التحكم - طلبات المستخدم {% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">قائمة طلبات الفعاليات للمستخدم</h1>
+    <form method="GET" action="" class="flex flex-col md:flex-row gap-4 mb-6">
+        <div class="relative flex-grow">
+            <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500">
+                <i class="fas fa-search"></i>
+            </span>
+            <input type="text" name="search" class="bg-white dark:bg-gray-800 w-full pr-10 pl-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white" placeholder="بحث باسم الفعالية..." minlength="3" value="{{request.GET.search}}">
+        </div>
+        
+  
+    </form>
+
+ 
+  
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">إجمالي الطلبات</div>
+                <div class="text-xl font-bold text-gray-800 dark:text-white">{{data_summary.all}}</div>
+            </div>
+            <div class="bg-blue-100 dark:bg-blue-900/30 p-2.5 rounded-full">
+                <i class="fas fa-clipboard-list text-blue-600 dark:text-blue-400"></i>
+            </div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">الطلبات الجديدة</div>
+                <div class="text-xl font-bold text-gray-800 dark:text-white">{{data_summary.new}}</div>
+            </div>
+            <div class="bg-green-100 dark:bg-green-900/30 p-2.5 rounded-full">
+                <i class="fas fa-bell text-green-600 dark:text-green-400"></i>
+            </div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">الطلبات المقبولة</div>
+                <div class="text-xl font-bold text-gray-800 dark:text-white">{{data_summary.accepted}}</div>
+            </div>
+            <div class="bg-purple-100 dark:bg-purple-900/30 p-2.5 rounded-full">
+                <i class="fas fa-check-circle text-purple-600 dark:text-purple-400"></i>
+            </div>
+        </div>
+        
+        <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 flex items-center justify-between">
+            <div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">الطلبات المرفوضة</div>
+                <div class="text-xl font-bold text-gray-800 dark:text-white">{{data_summary.rejected}}</div>
+            </div>
+            <div class="bg-red-100 dark:bg-red-900/30 p-2.5 rounded-full">
+                <i class="fas fa-times-circle text-red-600 dark:text-red-400"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="bg-white dark:bg-gray-800 shadow-sm rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+   
+    <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                    <th scope="col" class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        #
+                    </th>
+                    <th scope="col" class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        الاسم
+                    </th>
+                    <th scope="col" class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        البريد الإلكتروني
+                    </th>
+                    <th scope="col" class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        رقم الجوال
+                    </th>
+                    <th scope="col" class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                         الفعالية
+                    </th>
+                    <th scope="col" class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        الحالة
+                   </th>
+                    <th scope="col" class="px-6 py-4 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                        الإجراءات
+                    </th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-700">
+
+                {% if user_requests %}
+                {% for request in user_requests %}
+                <tr class="hover:bg-gray-700/50 transition-colors">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-white">{{forloop.counter}}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center gap-3">
+                            <div>
+                                <div class="text-sm font-medium text-white">{{request.user.full_name}}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-white">{{request.user.email}}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-white">{{request.user.phone}}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-900/30 text-blue-300">
+                            {{request.event.title}}
+                        </span>
+                        <br>
+                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-900/30 text-gray-300 mt-2">
+                            {{request.event.startdate_ar}}
+                        </span>
+                        <br>
+                        <span class="px-2 py-1 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-900/30 text-orange-300 mt-2">
+                            {{request.event.enddate_ar}}
+                        </span>
+                    </td>
+
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        {% if request.status == 'waiting' %}
+                        <span class="bg-yellow-500 text-white text-xs px-3 py-1.5 rounded-full md:inline-block block text-center mt-2 md:mt-0">بانتظار الرد</span>
+                        {%elif request.status == 'accepted'  %}
+                        <span class="bg-green-500 text-white text-xs px-3 py-1.5 rounded-full md:inline-block block text-center mt-2 md:mt-0">مقبول</span>
+                        {%elif request.status == 'rejected'  %}
+                        <span class="bg-red-500 text-white text-xs px-3 py-1.5 rounded-full md:inline-block block text-center mt-2 md:mt-0">مرفوض</span>
+                        {%elif request.status == 'canceled'  %}
+                        <span class="bg-red-500 text-white text-xs px-3 py-1.5 rounded-full md:inline-block block text-center mt-2 md:mt-0">ملغي من المستخدم</span>
+                     {% elif request.status == 'attend'  %}
+                        <span class="bg-blue-500 text-white text-xs px-3 py-1.5 rounded-full md:inline-block block text-center mt-2 md:mt-0">تم الحضور</span>
+                    {% elif request.status == 'absent'  %}
+                    <span class="bg-red-500 text-white text-xs px-3 py-1.5 rounded-full md:inline-block block text-center mt-2 md:mt-0">غائب</span>
+                    
+                    
+                        {% endif %}
+                    </td>
+                    
+                    <td class="px-6 py-4 whitespace-nowrap text-left">
+                        <div class="flex items-center gap-2">
+                            {% if request.status != 'accepted' and request.status != 'attend' and request.status != 'absent'  %}
+                            <button class="text-green-400 hover:text-green-300 transition-colors" onclick="confirmAccept(event, '{% url 'dashboard:dashboard_request_accept_view' request.id %}')">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            {% endif %}
+
+                            {% if request.status != 'rejected' and request.status != 'attend' and request.status != 'absent'  %}
+                            <button class="text-red-400 hover:text-red-300 transition-colors" onclick="confirmReject(event, '{% url 'dashboard:dashboard_request_reject_view' request.id %}')">
+                                <i class="fas fa-times"></i>
+                            </button>
+                            {% endif %}
+                            <button onclick="confirmDelete(event, '{% url 'dashboard:dashboard_request_delete_view' request.id %}')" class="text-red-400 hover:text-red-300 transition-colors">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% else %}
+
+                <tr class="hover:bg-gray-700/50 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap" colspan="8">
+                    <div class="text-sm text-white text-center">لايوجد بيانات </div>
+                </td>
+                </tr>
+                {% endif %}
+                
+
+            
+            </tbody>
+        </table>
+    </div>
+    
+   
+</div>
+<script>
+    function confirmDelete(event, url) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'هل انت متاكد ؟',
+            text: "لن تتمكن من التراجع",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'نعم ، احذف',
+            cancelButtonText: 'الغاء'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+    function confirmAccept(event, url) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'هل انت متاكد ؟',
+            text: "لن تتمكن من التراجع",
+            icon: 'warning',
+            showCancelButton: true,
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'نعم ، اقبل الطلب',
+            cancelButtonText: 'الغاء'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+    function confirmAccept(event, url) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'هل انت متاكد ؟',
+            text: "سيتم قبول طلب المستخدم",
+            icon: 'warning',
+            showCancelButton: true,
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'نعم ، اقبل الطلب',
+            cancelButtonText: 'الغاء'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+    function confirmReject(event, url) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'هل انت متاكد ؟',
+            text: "سيتم رفض طلب المستخدم",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: 'red',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'نعم ، ارفض الطلب',
+            cancelButtonText: 'الغاء'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+</script>
+{% endblock %}

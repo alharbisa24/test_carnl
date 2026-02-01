@@ -1,0 +1,211 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %} ملتقى - الملف الشخصي {% endblock %}
+
+{% block content %}
+
+<div class="bg-gradient-to-br from-blue-900 to-blue-950 text-white py-12 px-6 rounded-3xl shadow-lg mb-8 animate-fade">
+  <div class="container mx-auto max-w-5xl">
+    <div class="flex flex-col md:flex-row items-center justify-between">
+      <div class="flex items-center gap-4 mb-4 md:mb-0">
+        <div class="bg-blue-600 text-white w-24 h-24 rounded-full flex items-center justify-center text-3xl font-bold ">
+          {{ user.first_name|first }}
+        </div>
+        <div class="text-center md:text-right">
+          <h1 class="text-2xl lg:text-3xl font-bold">{{ user.first_name }}{{user.last_name}}</h1>
+          <p class="text-blue-100">{{ user.email }}</p>
+        </div>
+      </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-6 text-center">
+      <div class="bg-black p-4 rounded-lg shadow-md">
+        <span class="block text-4xl font-extrabold">{{ data.all_events }}</span>
+        <span class="text-blue-200 text-sm">الطلبات</span>
+      </div>
+      <div class="bg-green-800 p-4 rounded-lg shadow-md">
+        <span class="block text-4xl font-extrabold">{{ data.accepted_events }}</span>
+        <span class="text-blue-200 text-sm">المقبولة</span>
+      </div>
+      <div class="bg-red-800 p-4 rounded-lg shadow-md">
+        <span class="block text-4xl font-extrabold">{{ data.rejected_events }}</span>
+        <span class="text-blue-200 text-sm">المرفوضة</span>
+      </div>
+      <div class="bg-blue-800 p-4 rounded-lg shadow-md">
+        <span class="block text-4xl font-extrabold">{{ data.attended_events }}</span>
+        <span class="text-blue-200 text-sm">الحضور</span>
+      </div>
+      <div class="bg-orange-800 p-4 rounded-lg shadow-md">
+        <span class="block text-4xl font-extrabold">{{ data.absent_events }}</span>
+        <span class="text-blue-200 text-sm">الغياب</span>
+      </div>
+    </div>
+    </div>
+  </div>
+</div>
+
+
+
+{% if request.GET.updated == 'True' %}
+<div class="container mx-auto max-w-7xl px-6 mb-4">
+  <div class="bg-green-100 text-green-800 p-4 rounded-md text-center">
+    تم تحديث البيانات بنجاح
+  </div>
+</div>
+{% endif %}
+
+{% if request.GET.exists == 'True' %}
+<div class="container mx-auto max-w-7xl px-6 mb-4">
+  <div class="bg-red-100 text-red-800 p-4 rounded-md text-center">
+    عذرا ! رقم الجوال او البريد الالكتروني موجود مسبقا
+
+</div>
+</div>
+{% endif %}
+
+
+{% if request.GET.incoorect_passwords_equals == 'True' %}
+<div class="container mx-auto max-w-7xl px-6 mb-4">
+  <div class="bg-red-100 text-red-800 p-4 rounded-md text-center">
+كلمات المرور غير متطابقة
+
+</div>
+</div>
+{% endif %}
+
+{% if request.GET.incorrect_pass == 'True' %}
+<div class="container mx-auto max-w-7xl px-6 mb-4">
+  <div class="bg-red-100 text-red-800 p-4 rounded-md text-center">
+
+    كلمة المرور الحالية غير صحيحة
+</div>
+</div>
+{% endif %}
+<div class="container mx-auto max-w-7xl px-6 pb-16 animate-fade">
+  
+  <div class="space-y-8">
+    <div class="bg-white rounded-3xl shadow-md overflow-hidden border border-gray-100">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold text-gray-800">البيانات الشخصية</h2>
+          <button id="edit_info_button" class="text-blue-600 hover:text-blue-800">
+            تعديل  <i class="fas fa-pen"></i> 
+          </button>
+        </div>
+        
+        <div id="view_info">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <p class="text-gray-500 text-sm mb-1">الاسم الكامل</p>
+              <p class="text-gray-800 font-medium">{{ user.first_name }} {{user.last_name}} </p>
+            </div>
+            <div>
+              <p class="text-gray-500 text-sm mb-1">البريد الإلكتروني</p>
+              <p class="text-gray-800 font-medium">{{ user.email }}</p>
+            </div>
+            <div>
+              <p class="text-gray-500 text-sm mb-1">اسم المستخدم</p>
+              <p class="text-gray-800 font-medium">{{ user.username }}</p>
+            </div>
+            <div>
+              <p class="text-gray-500 text-sm mb-1">تاريخ التسجيل</p>
+              <p class="text-gray-800 font-medium">{{ user.date_joined|date:"Y/m/d" }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <div id="edit_view_info" class="hidden">
+          <form action="{% url 'home:profile_view' %}" method="post" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% csrf_token %}
+
+            <div>
+              <label class="block text-gray-500 text-sm mb-1" for="first_name">اسم الاول</label>
+              <input type="text" name="first_name" id="first_name" value="{{ user.first_name }}" 
+                     class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div>
+              <label class="block text-gray-500 text-sm mb-1" for="last_name">اسم الاخير</label>
+              <input type="text" name="last_name" id="last_name" value="{{ user.last_name }}" 
+                     class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div>
+              <label class="block text-gray-500 text-sm mb-1" for="email">اسم المستخدم</label>
+              <input type="text" name="username" id="username" value="{{ user.username }}" 
+                     class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div>
+              <label class="block text-gray-500 text-sm mb-1" for="email">البريد الإلكتروني</label>
+              <input type="email" name="email" id="email" value="{{ user.email }}" 
+                     class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div class="md:col-span-2 flex justify-end gap-2 mt-4">
+              <button type="button" id="cancel_edit_button" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                إلغاء
+              </button>
+              <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all">
+                حفظ التغييرات
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    
+    <div class="bg-white rounded-3xl shadow-md overflow-hidden border border-gray-100">
+      <div class="p-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold text-gray-800">تغيير كلمة المرور</h2>
+        </div>
+        
+        <form action="{% url 'home:change_password' %}" method="post">
+          {% csrf_token %}
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-gray-500 text-sm mb-1" for="current_password">كلمة المرور الحالية</label>
+              <input type="password" name="current_password" id="current_password" required
+                     class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div class="md:col-span-2 h-0"></div>
+            <div>
+              <label class="block text-gray-500 text-sm mb-1" for="new_password">كلمة المرور الجديدة</label>
+              <input type="password" name="new_password" id="new_password" required
+                     class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div>
+              <label class="block text-gray-500 text-sm mb-1" for="confirm_password">تاكيد كلمة المرور</label>
+              <input type="password" name="confirm_password" id="confirm_password"  required
+                     class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div class="md:col-span-2 flex justify-end mt-4">
+              <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all">
+                تغيير كلمة المرور
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+
+  
+  const editInfoBtn = document.getElementById('edit_info_button');
+  const cancelEditBtn = document.getElementById('cancel_edit_button');
+  const infoView = document.getElementById('view_info');
+  const infoEditMode = document.getElementById('edit_view_info');
+  
+  editInfoBtn.addEventListener('click', function() {
+    infoView.classList.add('hidden');
+    infoEditMode.classList.remove('hidden');
+  });
+  
+  cancelEditBtn.addEventListener('click', function() {
+    infoEditMode.classList.add('hidden');
+    infoView.classList.remove('hidden');
+  });
+  
+</script>
+{% endblock %}

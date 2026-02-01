@@ -1,0 +1,255 @@
+{% extends 'dashboard/panel/base.html' %}
+{% load static %}
+
+{% block title %} لوحة التحكم - الفعاليات {% endblock %}
+
+{% block content %}
+<div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div>
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">قائمة الفعاليات</h1>
+    </div>
+    
+
+    <button  onclick="openModal('addEventModal')"
+     class="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-md">
+        <i class="fas fa-plus"></i>
+        <span>اضافة فعالية جديدة</span>
+    </button>
+</div>
+{% if form.errors %}
+<div class="text-red-600 bg-red-50 p-4 rounded-md mb-4">
+    <ul>
+        {% for field in form %}
+                {% for error in field.errors %}
+                        <li> {{ error }}</li>
+                {% endfor %}
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+{% if success %}
+<div class="bg-green-100 text-green-800 p-4 rounded-md mb-4">
+    تم اضافة الفعالية بنجاح
+ </div>
+{% endif %}
+
+<form method="get" action="{% url 'dashboard:dashboard_events_view' %}" class="w-full">
+    <div class="relative">
+        <span class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-gray-500">
+            <i class="fas fa-search"></i>
+        </span>
+        <input type="text"  name="search" value="{{request.GET.search}}"  class="bg-white dark:bg-gray-800 w-full pr-10 pl-4 py-2.5 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:text-white" placeholder="بحث عن فعالية...">
+    </div>
+</form>
+<br>
+<div class="my-6 flex justify-center">
+    <div class="bg-gradient-to-r from-green-400 to-blue-500 text-white p-6 rounded-lg shadow-lg w-full  flex flex-col sm:flex-row items-center gap-4">
+        <div class="flex-1">
+            <h2 class="text-2xl font-bold mb-2">استخدام الذكاء الاصطناعي</h2>
+            <p class="text-sm text-gray-100">
+                استخدم ميزة مساعد الذكاء الاصطناعي لعرض تحليلات، توصيات، بناء على الفعاليات والحجوزات السابقة
+                
+            </p>
+        </div>
+        <a href="{% url 'dashboard:ai_recommendations_view' %}" class="bg-white text-blue-600 hover:bg-gray-100 px-6 py-3 rounded-lg font-medium text-sm transition-all duration-300 transform hover:scale-105 shadow-md">
+            <span>عرض التوصيات</span>
+            <i class="fas fa-robot"></i>
+        </a>
+    </div>
+</div>
+
+{% if events %}
+
+<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6 animate-fadeIn">
+    {% for event in events %}
+    
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-300 overflow-hidden flex flex-col">
+        <div class="relative">
+            <div class="h-48 bg-gradient-to-r from-blue-500 to-purple-600 flex items-center justify-center overflow-hidden">
+                <img src="{{event.image_url}}" class="w-full h-full object-cover opacity-50" alt="event">
+            </div>
+            <div class="absolute top-4 left-4">
+              {% if event.is_active == True %}
+                <span class=" text-xs font-medium px-2.5 py-0.5 rounded-full bg-green-900 text-green-300 flex items-center gap-1">
+                    <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                    متاح
+                </span>
+
+                {% else %}
+                <span class=" text-xs font-medium px-2.5 py-0.5 rounded-full bg-red-900 text-red-300 flex items-center gap-1">
+                    <span class="w-2 h-2 bg-red-500 rounded-full"></span>
+                    غير متاح
+                </span>
+                {% endif %}
+
+            </div>
+        </div>
+        <div class="p-4">
+            <h3 class=" text-xl font-bold text-white">{{event.title}}</h3>
+
+        </div>
+        <div class="p-4 bg-gray-100 dark:bg-gray-700 flex justify-between items-center">
+
+            <div class="flex items-center gap-2 text-sm">
+                <i class="fas fa-chair text-blue-600 dark:text-blue-400 w-5"></i>
+                <span class="text-gray-700 dark:text-gray-300">عدد المقاعد: {{ event.available_seats }}</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm">
+                <i class="fas fa-check-circle text-green-600 dark:text-green-400 w-5"></i>
+                <span class="text-gray-700 dark:text-gray-300">المقاعد المتبقية: {{event.available_seats_remaining}}</span>
+            </div>
+        </div>
+        <div class="p-5 flex-grow">
+            <p class="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">{{ event.description }}</p>
+            
+            <div class="space-y-3">
+                <div class="flex items-center gap-2 text-sm">
+                    <i class="fas fa-calendar-alt text-blue-600 dark:text-blue-400 w-5"></i>
+                    <span class="text-gray-700 dark:text-gray-300">تاريخ البداية: {{ event.startdate_ar }}</span>
+                </div>
+                
+                <div class="flex items-center gap-2 text-sm">
+                    <i class="fas fa-calendar-check text-blue-600 dark:text-blue-400 w-5"></i>
+                    <span class="text-gray-700 dark:text-gray-300">النهاية: {{ event.enddate_ar }}</span>
+                </div>
+                
+                <div class="flex items-center gap-2 text-sm">
+                    <i class="fas fa-user-tie text-blue-600 dark:text-blue-400 w-5"></i>
+                    <span class="text-gray-700 dark:text-gray-300">تمت اضافته من قبل: {{event.created_by}}</span>
+                </div>
+                
+                <div class="flex items-center gap-2 text-sm">
+                    <i class="fas fa-history text-blue-600 dark:text-blue-400 w-5"></i>
+                    <span class="text-gray-700 dark:text-gray-300">تاريخ الإنشاء: {{event.created_at_ar}}</span>
+                </div>
+                
+               
+            </div>
+        </div>
+        
+        <div class="bg-gray-50 dark:bg-gray-700/50 p-4 flex flex-wrap justify-center gap-2">
+         
+            
+            <a 
+            href="{% url 'dashboard:dashboard_event_requests_view' event.id %}"
+            class="flex items-center gap-1 bg-purple-600 hover:bg-purple-700 text-white px-3 py-1.5 rounded-lg text-sm transition-colors">
+                <span>قائمة الزوار</span>
+                <i class="fas fa-users"></i>
+
+        </a>
+            
+            <a href="{% url 'dashboard:dashboard_event_edit_view' event.id%}" class="flex items-center gap-1 bg-amber-500 hover:bg-amber-600 text-white px-3 py-1.5 rounded-lg text-sm transition-colors">
+                <span>تعديل</span>
+                <i class="fas fa-edit"></i>
+
+            </a>
+            
+            <a href="#" onclick="confirmDelete(event, '{% url 'dashboard:dashboard_event_delete_view' event.id %}')" class="flex items-center gap-1 bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm transition-colors">
+                <span>حذف</span>
+                <i class="fas fa-trash-alt"></i>
+
+            </a>
+        </div>
+    </div>
+    
+  {% endfor %}
+</div>
+{%else%}
+<div class="bg-red-900 text-center p-4 rounded-2xl text-white w-full">لايوجد فعاليات متوفرة حاليا</div>
+  {% endif %}
+<div class="flex justify-center mt-8">
+    <nav class="inline-flex rounded-md shadow-sm -space-x-px rtl:space-x-reverse bg-gray-800 border-gray-700 text-gray-300">
+        <a href="{% if events.has_previous %}?page={{ events.previous_page_number }}{% else %}#{% endif %}" 
+           class="relative inline-flex items-center px-2 py-2 rounded-r-md border bg-gray-700 text-sm font-medium hover:bg-gray-600 {% if not events.has_previous %}opacity-50 cursor-not-allowed{% endif %}">
+            <i class="fas fa-chevron-right"></i>
+        </a>
+        
+        {% for i in events.paginator.page_range %}
+            <a href="?page={{ i }}" 
+           class="relative inline-flex items-center px-4 py-2 border bg-gray-700 text-sm font-medium {% if events.number == i %}text-blue-400 border-blue-500 z-10{% else %}hover:bg-gray-600{% endif %}">
+            {{ i }}
+            </a>
+        {% endfor %}
+        
+        <a href="{% if events.has_next %}?page={{ events.next_page_number }}{% else %}#{% endif %}" 
+           class="relative inline-flex items-center px-2 py-2 rounded-l-md border bg-gray-700 text-sm font-medium hover:bg-gray-600 {% if not events.has_next %}opacity-50 cursor-not-allowed{% endif %}">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+    </nav>
+</div>
+<div id="addEventModal" class="fixed inset-0 z-50 bg-black/50 flex items-center justify-center px-4 overflow-y-auto hidden animate-fadeIn">
+    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg w-full max-w-xl p-6 space-y-6 relative">
+        <button onclick="closeModal('addEventModal')" class="absolute top-2 left-2 text-gray-600 hover:text-red-600 text-2xl">&times;</button>
+        <h2 class="text-2xl font-semibold text-gray-800 dark:text-white">إضافة فعالية جديدة</h2>
+        <form action="{% url 'dashboard:dashboard_events_view' %}" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="mt-2">
+                <label for="title" class="block text-sm font-medium text-gray-700 dark:text-gray-300">عنوان الفعالية</label>
+                <input type="text" id="title" name="title" placeholder="عنوان الفعالية" class="w-full rounded-lg border-gray-300 dark:border-gray-600 p-3 dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500" required>
+            </div>
+            <div class="mt-2">
+                <label for="image" class="block text-sm font-medium text-gray-700 dark:text-gray-300"> صورة الفعالية </label>
+  
+                        <input id="image" name="image" type="file" accept="image/png, image/jpeg, image/jpg" required class="w-full rounded-lg border-gray-300 dark:border-gray-600 p-3 dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500">
+            
+            </div>
+            <div class="mt-2">
+                <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">وصف الفعالية</label>
+                <textarea id="description" name="description" placeholder="وصف الفعالية" class="w-full rounded-lg border-gray-300 dark:border-gray-600 p-3 dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500" required></textarea>
+            </div>
+            
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="mt-2">
+                    <label for="location" class="block text-sm font-medium text-gray-700 dark:text-gray-300">رابط الموقع قوقل ماب</label>
+                    <input type="url" id="location" name="location" placeholder="https://example.com" class="w-full rounded-lg border-gray-300 dark:border-gray-600 p-3 dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+                <div class="mt-2">
+                    <label for="available_seats" class="block text-sm font-medium text-gray-700 dark:text-gray-300">عدد المقاعد </label>
+                    <input type="number" id="available_seats" name="available_seats" placeholder="50" class="w-full rounded-lg border-gray-300 dark:border-gray-600 p-3 dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="mt-2">
+                    <label for="start_datetime" class="block text-sm font-medium text-gray-700 dark:text-gray-300">تاريخ ووقت البداية</label>
+                    <input type="datetime-local" id="start_datetime" name="start_datetime" class="w-full rounded-lg border-gray-300 dark:border-gray-600 p-3 dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+                <div class="mt-2">
+                    <label for="end_datetime" class="block text-sm font-medium text-gray-700 dark:text-gray-300">تاريخ ووقت النهاية</label>
+                    <input type="datetime-local" id="end_datetime" name="end_datetime" class="w-full rounded-lg border-gray-300 dark:border-gray-600 p-3 dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500" required>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 mt-2">
+                <input type="checkbox" id="is_active" name="is_active" class="rounded border-gray-300 dark:border-gray-600 text-blue-600 focus:ring-blue-500">
+                <label for="is_active" class="text-sm font-medium text-gray-700 dark:text-gray-300">اظهار</label>
+            </div>
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="closeModal('addEventModal')" class="px-5 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600">إلغاء</button>
+                <button type="submit" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">حفظ</button>
+            </div>
+        </form>
+    </div>
+</div></div>
+
+<script>
+    function confirmDelete(event, url) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'هل أنت متأكد؟',
+            text: "لن تتمكن من التراجع",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'نعم ، احذف',
+            cancelButtonText: 'الغاء'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+</script>
+{% endblock %}
+

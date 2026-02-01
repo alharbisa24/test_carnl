@@ -1,0 +1,199 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %} ملتقى - سجل الحضور {% endblock %}
+
+{% block content %} 
+
+<div class="bg-gradient-to-br from-blue-900 to-blue-950 text-white py-12 px-6 rounded-3xl shadow-lg mb-8 animate-fade">
+  <div class="container mx-auto max-w-5xl text-center">
+      <h1 class="text-3xl lg:text-4xl font-bold mb-4">سجل الحضور</h1>
+      <p class="text-blue-100">سجل طلباتك لحضور الفعاليات </p>
+      <br>
+  
+        
+      
+  </div>
+</div>
+{% if 'canceled' in request.GET %}
+<div class="bg-green-100 text-green-800 p-4 rounded-md mb-4 text-center">
+   تم الغاء طلبك بنجاح
+</div>
+{% endif %}
+
+
+{% if request.GET.ratingadded == 'True' %}
+<div class="bg-green-100 text-green-800 p-4 rounded-md mb-4 text-center">
+    تم ارسال تقييمك بنجاح
+ </div>
+ {% endif %}
+
+<div class="container mx-auto max-w-7xl px-6 pb-16 animate-fade">
+  <div class="space-y-6">
+    {% if requests %}
+    {% for request in requests %}
+      <div class="bg-white rounded-3xl shadow-md overflow-hidden border border-gray-100 my-4">
+          <div class="flex flex-col md:flex-row">
+              <div class="w-full md:w-1/4 h-48 md:h-auto relative">
+                  <img src="{{request.event.image_url}}" alt="{{request.event.title}}" class="w-full h-full object-cover">
+               
+              </div>
+              
+              <div class="w-full md:w-3/4 p-6">
+                  <div class="flex justify-between items-start">
+                      <div>
+                          <h2 class="text-xl font-bold text-gray-800 mb-2">{{request.event.title}}</h2>
+                          <div class="flex items-center text-gray-600 mb-4 text-sm">
+                              <i class="far fa-calendar-alt ml-2"></i>
+                              <span>{{request.event.dateperiod}}</span>
+                              <span class="mx-2">•</span>
+                              <i class="far fa-clock ml-2"></i>
+                              <span>{{request.event.timeperiod}}</span>
+                          </div>
+                      </div>
+                        <div>
+                          {% if request.status == 'waiting' %}
+                          <span class="bg-yellow-500 text-white text-xs px-3 py-1.5 rounded-full md:inline-block block text-center mt-2 md:mt-0">بانتظار الرد</span>
+                          {%elif request.status == 'accepted'  %}
+                          <span class="bg-green-500 text-white text-xs px-3 py-1.5 rounded-full md:inline-block block text-center mt-2 md:mt-0">مقبول</span>
+                          {%elif request.status == 'rejected'  %}
+                          <span class="bg-red-500 text-white text-xs px-3 py-1.5 rounded-full md:inline-block block text-center mt-2 md:mt-0">مرفوض</span>
+                          {%elif request.status == 'canceled'  %}
+                          <span class="bg-red-500 text-white text-xs px-3 py-1.5 rounded-full md:inline-block block text-center mt-2 md:mt-0">ملغى من المستخدم</span>
+                          {% elif request.status == 'attend'  %}
+                          <span class="bg-blue-500 text-white text-xs px-3 py-1.5 rounded-full md:inline-block block text-center mt-2 md:mt-0">تم الحضور</span>
+                          {% elif request.status == 'absent'  %}
+                          <span class="bg-red-500 text-white text-xs px-3 py-1.5 rounded-full md:inline-block block text-center mt-2 md:mt-0">غائب</span>
+                        
+                          {% endif %}
+                        </div>
+                  </div>
+                  
+                  {% if request.request_rating %}
+                 
+                  <div class="border-t border-gray-100 mt-4 pt-4">
+                      <div class="flex items-center justify-between">
+                          <span class="text-gray-700 font-medium">تقييمك للفعالية</span>
+                          <div class="flex">
+                              
+                            <span class="text-yellow-400 flex">
+                                
+                                {% for i in "12345" %}
+                                    {% if forloop.counter <= request.request_rating.stars %}
+                                        <i class="fas fa-star"></i>
+                                    {% else %}
+                                        <i class="far fa-star text-gray-300"></i>
+                                    {% endif %}
+                                {% endfor %}
+
+                            </span>
+                              <span class="text-gray-600 text-sm mr-2">({{request.request_rating.stars}}/5)</span>
+                          </div>
+                      </div>
+                      <p class="text-gray-600 mt-2 text-sm">
+                        {{request.request_rating.comment}}
+                                        </p>
+                  </div>
+
+                  {%elif request.status == 'attend' and not request.request_rating %}
+                  <div class="border-t border-gray-100 mt-4 pt-4">
+                    <form action="{% url 'home:add_rating_for_event' request.id %}" method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="block text-gray-700 font-medium mb-2">تقييمك للفعالية</label>
+                            <div class="flex text-2xl cursor-pointer">
+                                <input type="radio" id="star1_{{ request.id }}" name="rating" value="1" class="hidden">
+                                <label for="star1_{{ request.id }}" class="far fa-star text-yellow-400 hover:text-yellow-500 transition-all" onclick="updateStars(1, {{ request.id }})"></label>
+                                
+                                <input type="radio" id="star2_{{ request.id }}" name="rating" value="2" class="hidden">
+                                <label for="star2_{{ request.id }}" class="far fa-star text-yellow-400 hover:text-yellow-500 transition-all" onclick="updateStars(2, {{ request.id }})"></label>
+                                
+                                <input type="radio" id="star3_{{ request.id }}" name="rating" value="3" class="hidden">
+                                <label for="star3_{{ request.id }}" class="far fa-star text-yellow-400 hover:text-yellow-500 transition-all" onclick="updateStars(3, {{ request.id }})"></label>
+                                
+                                <input type="radio" id="star4_{{ request.id }}" name="rating" value="4" class="hidden">
+                                <label for="star4_{{ request.id }}" class="far fa-star text-yellow-400 hover:text-yellow-500 transition-all" onclick="updateStars(4, {{ request.id }})"></label>
+                                
+                                <input type="radio" id="star5_{{ request.id }}" name="rating" value="5" class="hidden">
+                                <label for="star5_{{ request.id }}" class="far fa-star text-yellow-400 hover:text-yellow-500 transition-all" onclick="updateStars(5, {{ request.id }})"></label>
+                                
+                                <input type="hidden" id="rating_value_{{ request.id }}" name="rating" value="0">
+                            </div>
+
+                        </div>
+                        <script>
+                            function updateStars(rating, requestId) {
+                                const stars = document.querySelectorAll(`[for^="star"][for$="_${requestId}"]`);
+                                stars.forEach((star, index) => {
+                                    if (index < rating) {
+                                        star.classList.remove('far');
+                                        star.classList.add('fas');
+                                    } else {
+                                        star.classList.remove('fas');
+                                        star.classList.add('far');
+                                    }
+                                });
+                                const ratingInput = document.querySelector(`#rating_value_${requestId}`);
+                                if (ratingInput) {
+                                    ratingInput.value = rating;
+                                }
+                            }
+                        </script>
+
+                      
+                        <div class="mb-3">
+                            <label for="review" class="block text-gray-700 font-medium mb-2">تعليقك</label>
+                            <textarea name="comment" rows="3" class="w-full border border-gray-300 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all" placeholder="شاركنا تجربتك في هذه الفعالية..."></textarea>
+                        </div>
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all">إرسال التقييم</button>
+                    </form>
+                    </div>
+                </div>
+                {%elif request.status == 'waiting' %}
+                <p class="text-yellow-600 text-sm">طلبك قيد المراجعة</p>
+
+
+                {%elif request.status == 'rejected' %}
+                <p class="text-red-600 text-sm">تم رفض طلبك بسبب اكتمال العدد .</p>
+
+                {%elif request.status == 'accepted' %}
+                <div class="border-t border-gray-100 mt-4 pt-4">
+                  <div class="flex items-center">
+                      <i class="fas fa-info-circle text-green-500 ml-2"></i>
+                      <p class="text-gray-600 text-sm">تم قبول طلبك</p>
+                  </div>
+                  <div class="pt-2 flex items-center gap-4">
+                      <a href="{% url 'home:cancel_request_view' request.id %}" class="text-red-600 hover:text-red-800 flex items-center text-sm">
+                          <i class="fas fa-times-circle ml-2"></i> الغاء الطلب
+                      </a>
+                  </div>
+              </div>
+                  {%endif%}
+
+                
+
+
+
+              </div>
+          </div>
+      </div>
+      
+      {% endfor %}
+      {%else %}
+
+      <div class=" bg-white rounded-2xl shadow-md p-12 text-center border border-gray-100">
+        <h3 class="text-xl font-bold text-gray-800 mb-2">لا توجد طلبات حتى الآن</h3>
+        <a href="/" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-all inline-block">استعرض الفعاليات </a>
+    </div>
+
+    {% endif %}
+   
+    
+  </div>
+  
+
+</div>
+
+
+
+{% endblock %}

@@ -1,0 +1,186 @@
+{% extends 'dashboard/panel/base.html' %}
+{% load static %}
+
+{% block title %} لوحة التحكم - توصيات الذكاء الاصطناعي {% endblock %}
+
+{% block content %}
+<div class="mb-6">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+        <div>
+            <h1 class="text-2xl font-bold text-white mb-1">توصيات الذكاء الاصطناعي</h1>
+        </div>
+        
+    
+    </div>
+
+ 
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-gray-800 rounded-xl shadow-md border border-gray-700 p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-gray-300 font-medium">إجمالي الفعاليات</h3>
+                <div class="w-10 h-10 rounded-full bg-blue-900/30 flex items-center justify-center">
+                    <i class="fas fa-calendar-alt text-blue-400"></i>
+                </div>
+            </div>
+            <h2 class="text-3xl font-bold text-white">{{ total_events }}</h2>
+            <p class="text-gray-400 text-sm mt-1">فعالية</p>
+        </div>
+        
+        <div class="bg-gray-800 rounded-xl shadow-md border border-gray-700 p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-gray-300 font-medium">طلبات التسجيل</h3>
+                <div class="w-10 h-10 rounded-full bg-green-900/30 flex items-center justify-center">
+                    <i class="fas fa-user-check text-green-400"></i>
+                </div>
+            </div>
+            <h2 class="text-3xl font-bold text-white">{{ total_requests }}</h2>
+            <p class="text-gray-400 text-sm mt-1">طلب حضور</p>
+        </div>
+        
+        <div class="bg-gray-800 rounded-xl shadow-md border border-gray-700 p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-gray-300 font-medium">معدل الحضور</h3>
+                <div class="w-10 h-10 rounded-full bg-purple-900/30 flex items-center justify-center">
+                    <i class="fas fa-users text-purple-400"></i>
+                </div>
+            </div>
+            <h2 class="text-3xl font-bold text-white">{{ attendance_rate }}%</h2>
+            <p class="text-gray-400 text-sm mt-1">من إجمالي المسجلين</p>
+        </div>
+        
+        <div class="bg-gray-800 rounded-xl shadow-md border border-gray-700 p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-gray-300 font-medium">متوسط التقييمات</h3>
+                <div class="w-10 h-10 rounded-full bg-yellow-900/30 flex items-center justify-center">
+                    <i class="fas fa-star text-yellow-500"></i>
+                </div>
+            </div>
+            <h2 class="text-3xl font-bold text-white">{{ avg_rating }}/5</h2>
+            <div class="flex text-yellow-400 mt-1">
+                {% for i in "12345" %}
+                {% if forloop.counter <= avg_rating %}
+                    <i class="fas fa-star"></i>
+                {% else %}
+                    <i class="far fa-star text-gray-300"></i>
+                {% endif %}
+            {% endfor %}
+
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-gray-800 rounded-xl shadow-md border border-gray-700 p-6 mb-8">
+        <div class="flex items-center gap-3 mb-6">
+            <h3 class="text-xl font-bold text-white">تحليل عام</h3>
+        </div>
+        
+        <div class="bg-indigo-900/20 border-r-4 border-indigo-500 rounded-lg p-4 mb-4">
+            <p class="text-gray-300 leading-relaxed">
+                {{ ai_summary }}
+            </p>
+        </div>
+    </div>
+
+    <div class="bg-gray-800 rounded-xl shadow-md border border-gray-700 p-6 mb-8">
+        <h3 class="text-xl font-bold text-white mb-6">اكثر الفئات طلب</h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+                {% for category in categories %}
+                <div class="bg-gray-700 p-4 rounded-lg">
+                    <div class="flex justify-between items-center">
+                        <h4 class="text-gray-200 font-medium">{{ category.category }}</h4>
+                        <span class="bg-blue-900/30 text-blue-300 text-xs px-2 py-1 rounded">
+                            {{ category.count }} فعالية
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+
+    <div class="bg-gray-800 rounded-xl shadow-md border border-gray-700 p-6 mb-8">
+        <div class="flex items-center gap-3 mb-6">
+            <h3 class="text-xl font-bold text-white">تحليل للمستخدمين</h3>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-gray-700 p-5 rounded-lg">
+                <h4 class="text-lg font-medium text-white mb-4">مستوى مشاركة المستخدمين</h4>
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-gray-300">مستخدمين نشطين</span>
+                    <span class="text-white font-medium">{{ user_data.active_percentage }}%</span>
+                </div>
+                <div class="w-full bg-gray-600 rounded-full h-2.5 mb-4">
+                    <div class="bg-green-600 h-2.5 rounded-full" style="width: {{ user_data.active_percentage }}%"></div>
+                </div>
+                <p class="text-sm text-gray-400">{{ user_data.engagement_analysis }}</p>
+            </div>
+            
+            <div class="bg-gray-700 p-5 rounded-lg">
+                <h4 class="text-lg font-medium text-white mb-4">الاوقات الاكثر طلب </h4>
+                <div class="space-y-2">
+                    {% for time in user_data.popular_times %}
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-300">{{ time.day_name }}</span>
+                        <span class="text-white font-medium">{{ time.time }}</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                <p class="text-sm text-gray-400 mt-4">{{ user_data.time_analysis }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-gray-800 rounded-xl shadow-md border border-gray-700 p-6 mb-8">
+        <div class="flex items-center gap-3 mb-6">
+            <h3 class="text-xl font-bold text-white">توصيات ونصائح</h3>
+        </div>
+
+        <div class="space-y-6">
+            {% for recommendation in recommendations %}
+            <div class="bg-gray-700 rounded-lg p-5">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-8 h-8 rounded-full bg-blue-900/30 flex items-center justify-center">
+                        <i class="fas fa-comment text-blue-400"></i>
+                    </div>
+                    <h4 class="text-lg font-medium text-white">{{ recommendation.title }}</h4>
+                    
+                    {% if recommendation.importance == 'high' %}
+                    <span class="bg-red-900/30 text-red-300 text-xs px-2 py-1 rounded ml-auto">
+                         مهم
+                    </span>
+                    {% elif recommendation.importance == 'medium' %}
+                    <span class="bg-amber-900/30 text-amber-300 text-xs px-2 py-1 rounded ml-auto">
+                       متوسط
+                    </span>
+                    {% endif %}
+                </div>
+                <p class="text-gray-300">{{ recommendation.description }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="bg-gray-800 rounded-xl shadow-md border border-gray-700 p-6">
+        <div class="flex items-center gap-3 mb-6">
+            <h3 class="text-xl font-bold text-white">افكار للفعاليات </h3>
+        </div>
+
+        <div class="space-y-4">
+            {% for idea in content_ideas %}
+            <div class="bg-gray-700 rounded-lg p-5">
+                <div class="flex justify-between items-start mb-3">
+                    <h4 class="text-lg font-medium text-white">{{ idea.title }}</h4>
+                    <span class="bg-purple-900/30 text-purple-300 text-xs px-2 py-1 rounded">
+                        {{ idea.category }}
+                    </span>
+                </div>
+                <p class="text-gray-300 mb-4">{{ idea.description }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

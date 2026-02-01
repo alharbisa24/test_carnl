@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %} {% endblock %}</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://kit.fontawesome.com/d430c26570.js" crossorigin="anonymous"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;800;900&display=swap" rel="stylesheet">
+
+</head>
+<style>
+    html{
+        font-family: "Tajawal", sans-serif;
+
+    }
+</style>
+<style>
+    @keyframes fade {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+  
+    .animate-fade {
+      animation: fade 0.5s ease-in-out;
+    }
+  </style>
+<body class="p-5">
+
+<nav class="sticky top-2 flex justify-between text-lg flex-wrap items-center bg-white/70 backdrop-blur-sm p-3 rounded-xl z-50 border border-gray-100">
+    <a href="/" class="flex-shrink-0">
+    <h1 class="text-2xl">ملتقى</h1>
+    </a>
+
+    <button class="md:hidden text-xl" id="menu-toggle">
+    <i class="fa-solid fa-bars"></i>
+    </button>
+
+    <div class="hidden md:flex md:flex-row gap-10 items-center w-full md:w-auto" id="menu">
+    <a href="{% url 'home:home_view' %}" class="block md:inline-block my-2"> الرئيسية </a>
+    <a href="{% url 'home:events_view' %}" class="block md:inline-block my-2"> الفعاليات </a>
+   
+    {% if request.user.is_authenticated %}
+    <div class="relative inline-block group">
+      <button
+      class="my-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-3xl transition duration-300 focus:outline-none"
+      >
+      مرحبا {{ user.first_name }} !
+      </button>
+    
+      <div
+      class="absolute left-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-300 z-50"
+      >
+      <a
+        href="{% url 'home:profile_view' %}"
+        class="block px-4 py-2 hover:bg-gray-100 transition duration-300"
+        >الملف الشخصي</a
+      >
+      <a
+        href="{% url 'home:requests_view' %}"
+        class="block px-4 py-2 hover:bg-gray-100 transition duration-300"
+        >سجل الحضور</a
+      >
+      <a
+        href="{% url 'home:home_logout_view' %}"
+        class="block px-4 py-2 text-red-600 hover:bg-red-50 hover:text-red-700 transition duration-300"
+        >تسجيل الخروج</a
+      >
+      </div>
+    </div>
+    {% endif %}
+    <script>
+      document.querySelector('.group > button').addEventListener('click', (e) => {
+      e.preventDefault();
+      const dropdown = document.querySelector('.group > div');
+      dropdown.classList.toggle('opacity-0');
+      dropdown.classList.toggle('invisible');
+      });
+    </script>
+    
+  </div>
+    </div>
+  </nav>
+
+  <script>
+    const menuToggle = document.getElementById('menu-toggle');
+    const menu = document.getElementById('menu');
+
+    menuToggle.addEventListener('click', () => {
+    menu.classList.toggle('hidden');
+    });
+  </script>
+
+<main class="flex-grow">
+
+   
+    {% block content %}
+
+
+    {% endblock %}
+
+    </main>
+
+
+</body>
+</html>

@@ -1,0 +1,132 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %}ملتقى - انشاء حساب {% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4 sm:px-6 lg:px-8 rounded-2xl">
+  <div class="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden">
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-700 py-6 px-8">
+      <div class="text-center">
+        <h2 class="text-2xl font-bold text-white">انشاء حساب </h2>
+      </div>
+    </div>
+    
+
+
+    <div class="py-8 px-8">
+      <form method="post" action="{% url 'home:register_view' %}" class="space-y-6">
+        {% csrf_token %}
+        
+
+        
+        <div>
+            <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1"> الاسم الاول</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <i class="fas fa-user text-gray-400"></i>
+              </div>
+              <input id="first_name" name="first_name" type="text" required 
+                    class="appearance-none block w-full pr-10 py-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150" 
+                    placeholder=" الاسم الاول">
+            </div>
+          </div>
+
+
+
+         
+          <div>
+            <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1"> الاسم الاخير</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <i class="fas fa-user text-gray-400"></i>
+              </div>
+              <input id="last_name" name="last_name" type="text" required 
+                    class="appearance-none block w-full pr-10 py-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150" 
+                    placeholder=" الاسم الاخير">
+            </div>
+          </div>
+
+       
+          <div>
+            <label for="username" class="block text-sm font-medium text-gray-700 mb-1"> اسم المستخدم</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <i class="fas fa-user text-gray-400"></i>
+              </div>
+              <input id="username" name="username" type="text" required 
+                    class="appearance-none block w-full pr-10 py-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150" 
+                    placeholder="username">
+            </div>
+          </div>
+
+          <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-1"> البريد الإلكتروني</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <i class="fas fa-envelope text-gray-400"></i>
+            </div>
+            <input id="email" name="email" type="text" required 
+                  class="appearance-none block w-full pr-10 py-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150" 
+                  placeholder="mail@mail.com">
+          </div>
+        </div>
+        
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700 mb-1">كلمة المرور</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <i class="fas fa-lock text-gray-400"></i>
+            </div>
+            <input id="password" name="password" type="password" required 
+                  class="appearance-none block w-full pr-10 py-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150" 
+                  placeholder="أدخل كلمة المرور">
+          </div>
+        </div>
+        <div>
+            <label for="password" class="block text-sm font-medium text-gray-700 mb-1">تاكيد كلمة المرور</label>
+            <div class="relative">
+              <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                <i class="fas fa-lock text-gray-400"></i>
+              </div>
+              <input id="confirm_password" name="confirm_password" type="password" required 
+                    class="appearance-none block w-full pr-10 py-3 border border-gray-300 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150" 
+                    placeholder="أدخل كلمة المرور">
+            </div>
+          </div>
+          {% if form.errors %}
+          <div class="text-red-600 bg-red-50 p-4 rounded-md mb-4">
+              <ul>
+                  {% for field in form %}
+                          {% for error in field.errors %}
+                                  <li> {{ error }}</li>
+                          {% endfor %}
+                  {% endfor %}
+              </ul>
+          </div>
+          {% endif %}
+        <div>
+          <button type="submit" class="group relative w-full flex justify-center py-3 px-4 border border-transparent rounded-lg text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition duration-150 shadow-md">
+            <span class="absolute left-0 inset-y-0 flex items-center pl-3">
+              <i class="fas fa-sign-in-alt text-blue-300 group-hover:text-blue-200 transition duration-150"></i>
+            </span>
+            تسجيل الدخول
+          </button>
+        </div>
+        
+        
+        
+      </form>
+      
+      <div class="mt-6 text-center">
+        <p class="text-sm text-gray-600">
+          لديك حساب سابق؟ 
+          <a href="{% url 'home:login_view' %}" class="font-medium text-blue-600 hover:text-blue-500 transition duration-150">
+            تسجيل الدخول
+          </a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

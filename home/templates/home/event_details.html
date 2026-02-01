@@ -1,0 +1,231 @@
+{% extends 'home/base.html' %}
+{% load static %}
+
+{% block title %} ملتقى - تفاصيل الفعالية {% endblock %}
+
+{% block content %} 
+
+<section class="relative py-16 bg-gradient-to-br from-blue-900 to-blue-950 rounded-3xl">
+  
+  <div class="container mx-auto px-6 relative">
+    <div class="flex flex-col lg:flex-row gap-10 items-center">
+      <div class="w-full lg:w-1/2 relative">
+        <div class="relative rounded-2xl overflow-hidden shadow-2xl shadow-blue-900/50">
+          <img src="{{event.image_url}}" 
+              class="w-full h-80 lg:h-[400px] object-cover bg-no-repeat
+              ">
+          <div class="absolute inset-0 bg-gradient-to-t from-blue-950/80 to-transparent"></div>
+          
+          <div class="absolute top-4 right-4">
+            {% if event.is_active == True %}
+            <span class="bg-green-500 text-white text-sm font-semibold px-4 py-1.5 rounded-full shadow-lg">متاح</span>
+
+
+            {% else %}
+            <span class="bg-red-500 text-white text-sm font-semibold px-4 py-1.5 rounded-full shadow-lg">غير متاح</span>
+
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+      <div class="w-full lg:w-1/2 text-white">
+      
+        <h1 class="text-4xl lg:text-5xl font-bold mb-6"> {{event.title}}</h1>
+        
+        <div class="flex flex-wrap gap-6 mb-8">
+          <div class="flex items-center gap-2">
+            <div class="bg-blue-800/50 p-2 rounded-lg">
+              <i class="far fa-calendar-alt text-blue-300 text-lg"></i>
+            </div>
+            <span class="text-blue-100">{{event.dateperiod}}</span>
+          </div>
+          
+          <div class="flex items-center gap-2">
+            <div class="bg-blue-800/50 p-2 rounded-lg">
+              <i class="far fa-clock text-blue-300 text-lg"></i>
+            </div>
+            <span class="text-blue-100">{{event.timeperiod}}</span>
+          </div>
+          
+        
+        </div>
+        
+        <div class="flex flex-wrap gap-4 mb-8">
+          <div class="flex items-center gap-2 bg-blue-800/30 px-4 py-2 rounded-lg">
+            <i class="fas fa-users text-blue-300"></i>
+            <span class="text-blue-100">{{event.available_seats}} مشارك</span>
+          </div>
+          
+          <div class="flex items-center gap-2 bg-blue-800/30 px-4 py-2 rounded-lg">
+            <i class="fas fa-ticket-alt text-blue-300"></i>
+            <span class="text-blue-100"> {{event.available_seats_remaining}} مقعد متبقي </span>
+          </div>
+        </div>
+        
+       
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if success == "True" %}
+
+<div class="bg-green-700 my-5 mx-2 p-3 text-center rounded-3xl text-white">
+  تم تقديم طلب الانضمام بنجاح !
+</div>
+
+{%endif%}
+
+{% if error == "exists" %}
+
+<div class="bg-red-700 my-5 mx-2 p-3 text-center rounded-3xl text-white">
+  عذرا ! يوجد لديك طلب سابق لنفس الفعالية
+</div>
+
+{%endif%}
+
+<section class="py-16 bg-white">
+  <div class="container mx-auto px-6">
+    <div class="flex flex-col lg:flex-row gap-10">
+      <div class="w-full lg:w-2/3">
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 mb-8">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">تفاصيل الفعالية</h2>
+          
+          <div class="prose max-w-none text-gray-600">
+            <p class="mb-4">
+              {{event.description}}
+            </p>
+          </div>
+        </div>
+     
+        
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+          <h2 class="text-2xl font-bold text-gray-800 mb-6">الموقع</h2>
+          
+          <div class="rounded-xl overflow-hidden mb-6 h-64">
+            <iframe
+            src="{{event.location}}"
+            style="border:0;"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            class="rounded-2xl w-full h-90">
+          </iframe>
+          
+          
+
+          </div>
+          
+       
+          
+        </div>
+      </div>
+      <div class="w-full lg:w-1/3" id="register">
+        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+      <h2 class="text-2xl font-bold text-gray-800 mb-6">احجز مقعدك</h2>
+      
+      {% if event.is_active == True %}
+      {% if event.available_seats_remaining > 0 %}
+      {% if request.user.is_authenticated %}
+        {% if user_has_request == True %}
+          <p class="text-gray-500 text-sm mt-4 text-center">
+            يوجد حجز سابق للفعالية
+          </p>
+        {% else %}
+          <form method="post" action="{% url 'home:book_event_request' event.id %}">
+            {% csrf_token %}
+            <button type="submit" class="w-full bg-gradient-to-r from-cyan-600 to-blue-600 text-white py-3 rounded-xl font-medium hover:shadow-lg hover:shadow-cyan-500/25 transition-all">
+        تأكيد الحجز
+            </button>
+          </form>
+        {% endif %}
+      {% else %}
+        <p class="text-gray-500 text-sm mt-4 text-center">
+          يجب تسجيل الدخول لتأكيد الحجز. <a href="{% url 'home:login_view' %}" class="text-blue-600 hover:underline">تسجيل الدخول</a>
+        </p>
+      {% endif %}
+      {% else %}
+        <p class="text-red-500 text-sm mt-4 text-center">
+          لا يوجد مقاعد متاحة لهذه الفعالية
+        </p>
+      {% endif %}
+      {% else %}
+
+      <p class="text-red-500 text-sm mt-4 text-center">
+        عذرا ، التسجيل مغلق
+       </p>
+      {% endif %}
+      </div>
+      
+      <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 mb-8 mt-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6">تقييمات المستفيدين</h2>
+        
+        <div class="space-y-6">
+       
+          {% if event_ratings %}
+          {% for rating in page_obj %}
+          <div class="border-b border-gray-100 pb-5 mb-5 last:border-0 last:pb-0 last:mb-0">
+            <div class="flex justify-between items-center mb-2">
+              <div class="flex items-center">
+                <div>
+                  <h4 class="font-medium text-gray-800">{{rating.request.user.full_name}}</h4>
+                  <div class="text-sm text-gray-500">{{rating.created_at}}</div>
+                </div>
+              </div>
+              <div class="flex text-yellow-400">
+                {% for i in "12345" %}
+                {% if forloop.counter <= rating.stars %}
+                    <i class="fas fa-star"></i>
+                {% else %}
+                    <i class="far fa-star text-gray-300"></i>
+                {% endif %}
+            {% endfor %}
+
+              </div>
+              
+            </div>
+            <p class="text-gray-600">{{rating.comment}}</p>
+          </div>
+          {% endfor %}
+          {%else%}
+
+          <span class="text-red-500">لايوجد تقييمات</span>
+
+          {%endif%}
+      
+       
+      
+          <div class="text-center py-6 text-gray-500" style="display: none;">
+            <p>لا توجد تقييمات حتى الان</p>
+          </div>
+
+<div class="flex justify-center mt-8">
+  <nav class="inline-flex rounded-md shadow-sm -space-x-px rtl:space-x-reverse">
+      <a href="{% if page_obj.has_previous %}?page={{ page_obj.previous_page_number }}{% else %}#{% endif %}" 
+         class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 {% if not page_obj.has_previous %}opacity-50 cursor-not-allowed{% endif %}">
+          <span class="sr-only">السابق</span>
+          <i class="fas fa-chevron-right"></i>
+      </a>
+      
+      {% for i in page_obj.paginator.page_range %}
+          <a href="?page={{ i }}" 
+         class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium {% if page_obj.number == i %}text-blue-600 border-blue-500 z-10{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+          {{ i }}
+          </a>
+      {% endfor %}
+      
+      <a href="{% if page_obj.has_next %}?page={{ page_obj.next_page_number }}{% else %}#{% endif %}" 
+         class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 {% if not page_obj.has_next %}opacity-50 cursor-not-allowed{% endif %}">
+          <span class="sr-only">التالي</span>
+          <i class="fas fa-chevron-left"></i>
+      </a>
+  </nav>
+</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+{% endblock %}
